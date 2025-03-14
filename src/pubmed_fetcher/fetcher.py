@@ -3,7 +3,7 @@ import csv
 import re
 from typing import List, Dict, Optional
 
-def fetch_papers(query: str) -> List[Dict]:
+def fetcher(query: str) -> List[Dict]:
     """Fetch papers from PubMed API based on the given query."""
     base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
     params = {
@@ -94,7 +94,7 @@ def save_to_csv(papers: List[Dict], filename: str):
 
 def main():
     query = input("Enter search query: ")
-    papers = fetch_papers(query)
+    papers = fetcher(query)
     save_to_csv(papers, "pubmed_results.csv")
     print("Results saved to pubmed_results.csv")
 
