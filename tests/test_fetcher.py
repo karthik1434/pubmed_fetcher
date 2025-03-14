@@ -1,6 +1,6 @@
 import pytest
-from pubmed_fetcher.fetcher import fetch_papers
+from pubmed_fetcher.fetcher import fetcher
 
-def test_fetch_papers():
-    result = fetch_papers("cancer")
+def test_fetcher():
+    result = fetcher("cancer")
     assert isinstance(result, list)
