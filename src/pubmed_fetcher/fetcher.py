@@ -1,7 +1,9 @@
 import requests
 import csv
 import re
+import os
 from typing import List, Dict, Optional
+from xml.etree import ElementTree as ET
 
 def fetcher(query: str) -> List[Dict]:
     """Fetch papers from PubMed API based on the given query."""
@@ -29,16 +31,18 @@ def fetch_paper_details(pmids: List[str]) -> List[Dict]:
     response = requests.get(base_url, params=params)
     response.raise_for_status()
     
-    from xml.etree import ElementTree as ET
     root = ET.fromstring(response.text)
-    
     papers = []
+
     for article in root.findall(".//PubmedArticle"):
-        pmid = article.find(".//PMID").text
-        title = article.find(".//ArticleTitle").text
-        pub_date = article.find(".//PubDate/Year")
-        pub_date = pub_date.text if pub_date is not None else "N/A"
-        
+        pmid_elem = article.find(".//PMID")
+        title_elem = article.find(".//ArticleTitle")
+        pub_date_elem = article.find(".//PubDate/Year")
+
+        pmid = pmid_elem.text if pmid_elem is not None else "N/A"
+        title = title_elem.text if title_elem is not None else "N/A"
+        pub_date = pub_date_elem.text if pub_date_elem is not None else "N/A"
+
         authors = []
         for author in article.findall(".//Author"):
             last_name = author.find("LastName")
@@ -50,8 +54,12 @@ def fetch_paper_details(pmids: List[str]) -> List[Dict]:
                 "affiliation": affiliation.text if affiliation is not None else "",
                 "email": extract_email(affiliation.text if affiliation is not None else "")
             })
-        
+
         non_academic_authors = identify_non_academic_authors(authors)
+        
+        if not non_academic_authors:
+            continue  # SKIP papers with NO non-academic authors
+
         company_authors = ", ".join([a["name"] for a in non_academic_authors])
         company_affiliations = ", ".join(set([a["affiliation"] for a in non_academic_authors]))
         corresponding_email = next((a["email"] for a in non_academic_authors if a["email"]), "")
@@ -76,7 +84,8 @@ def extract_email(affiliation: str) -> str:
 def identify_non_academic_authors(authors: List[Dict]) -> List[Dict]:
     """Identify non-academic authors based on affiliations."""
     non_academic = []
-    company_keywords = ["Inc", "Ltd", "LLC", "Corporation", "Pharma", "Biotech", "Company"]
+    company_keywords = ["Inc", "Ltd", "LLC", "Corporation", "Pharma", "Biotech", "Company", 
+                        "Genentech", "Pfizer", "Novartis", "Roche", "AstraZeneca", "Merck"]
     email_company_patterns = re.compile(r"@([a-zA-Z0-9.-]+)\.(com|net|org|co|biz)")
 
     for author in authors:
@@ -87,6 +96,10 @@ def identify_non_academic_authors(authors: List[Dict]) -> List[Dict]:
 
 def save_to_csv(papers: List[Dict], filename: str):
     """Save fetched papers to a CSV file."""
+    if not papers:
+        print("No papers found with non-academic authors.")
+        return
+
     with open(filename, mode="w", newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=papers[0].keys())
         writer.writeheader()
