@@ -77,12 +77,4 @@ pubmed_fetcher/
 - **Empty Results**: Displays a message if no matching papers are found.
 - **Invalid Input**: Ensures queries are properly formatted.
 
-## Contributing
-If you would like to contribute, feel free to fork the repository and submit a pull request.
-
-## License
-This project is licensed under the MIT License.
-
----
-For any questions, contact [your email or GitHub profile].
 
