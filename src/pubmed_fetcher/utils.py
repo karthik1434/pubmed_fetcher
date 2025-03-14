@@ -1,3 +1,4 @@
+import os
 import requests
 import csv
 import re
@@ -85,18 +86,46 @@ def identify_non_academic_authors(authors: List[Dict]) -> List[Dict]:
     
     return non_academic
 
-def save_to_csv(papers: List[Dict], filename: str):
+def save_to_csv(papers: List[Dict], results.csv: str):
     """Save fetched papers to a CSV file."""
-    with open(filename, mode="w", newline="", encoding="utf-8") as file:
+    with open(results.csv, mode="w", newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=papers[0].keys())
         writer.writeheader()
         writer.writerows(papers)
 
+def validate_csv(results.csv: str) -> bool:
+    """Validate if the CSV file matches the expected format."""
+    expected_fields = ["PubmedID", "Title", "Publication Date", "Non-academic Author(s)", "Company Affiliation(s)", "Corresponding Author Email"]
+    
+    if not os.path.exists(results.csv):
+        print(f"Error: {results.csv} not found.")
+        return False
+
+    with open(results.csv, mode="r", encoding="utf-8") as file:
+        reader = csv.DictReader(file)
+        if reader.fieldnames != expected_fields:
+            print("Error: CSV format does not match expected fields.")
+            return False
+        
+        for row in reader:
+            if not all(row[field] for field in expected_fields):
+                print(f"Error: Missing data in row {row}")
+                return False
+
+    print("CSV validation passed.")
+    return True
+
 def main():
     query = input("Enter search query: ")
     papers = fetcher(query)
-    save_to_csv(papers, "pubmed_results.csv")
-    print("Results saved to pubmed_results.csv")
+    filename = "results.csv"
+    save_to_csv(papers, filename)
+    print(f"Results saved to {filename}")
+
+    if validate_csv(filename):
+        print("CSV file is valid.")
+    else:
+        print("CSV file validation failed.")
 
 if __name__ == "__main__":
     main()
