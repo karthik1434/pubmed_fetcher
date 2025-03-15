@@ -22,43 +22,58 @@ PubMed Fetcher is a command-line tool that retrieves research papers from PubMed
 ## Installation
 ### Prerequisites
 - **Python 3.11.9** or later
-- **pip** (Python package manager)
+- **Poetry** (for dependency management)
 - **Git** (for version control)
 
 ### Setup Instructions
 1. **Clone the Repository**
    ```sh
-   git clone https://github.com/yourusername/pubmed_fetcher.git
+   git clone https://github.com/karthik1434/pubmed_fetcher.git
    cd pubmed_fetcher
    ```
-2. **Create a Virtual Environment** (optional but recommended)
+2. **Install Poetry (if not already installed)**
    ```sh
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   pip install poetry
    ```
 3. **Install Dependencies**
    ```sh
-   pip install -r requirements.txt
+   poetry install
    ```
 
 ## Usage
+### Activating the Virtual Environment
+Before running the program, activate the Poetry virtual environment:
+```sh
+poetry env activate
+```
+If using **PowerShell**:
+```powershell
+poetry env activate powershell
+```
+If using **Command Prompt (cmd)**:
+```cmd
+poetry env activate cmd
+```
+
+Alternatively, you can run commands without activating the environment using `poetry run`.
+
 ### Fetching Research Papers
 To fetch papers based on a query:
 ```sh
-python src/cli.py "cancer treatment" -f results.csv
+poetry run src\cli.py "cancer treatment" -f results.csv
 ```
 This will **fetch papers**, **filter non-academic authors**, and **save results** to `results.csv`.
 
 ### Debug Mode
 To enable debug mode:
 ```sh
-python src/cli.py "COVID-19 vaccine" -d
+poetry run src\cli.py "COVID-19 vaccine" -d
 ```
 
 ### Printing to Console
 If `-f` is omitted, results will be printed to the console:
 ```sh
-python src/cli.py "diabetes research"
+poetry run src\cli.py "diabetes research"
 ```
 
 ## Code Structure
@@ -69,7 +84,8 @@ pubmed_fetcher/
 │   ├── cli.py          # Command-line interface wrapper
 │── tests/              # Contains unit tests
 │── README.md          # Documentation
-│── requirements.txt    # Dependencies
+│── pyproject.toml      # Poetry configuration file
+│── poetry.lock         # Dependency lock file
 ```
 
 ## Error Handling

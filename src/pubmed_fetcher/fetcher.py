@@ -117,7 +117,6 @@ def save_to_csv(papers: List[Dict], filename: Optional[str] = None):
             writer = csv.DictWriter(file, fieldnames=papers[0].keys())
             writer.writeheader()
             writer.writerows(papers)
-        print(f"Results saved to {filename}")
     else:
         for paper in papers:
             print(paper)
