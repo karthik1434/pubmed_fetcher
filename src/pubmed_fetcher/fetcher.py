@@ -133,3 +133,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+def extract_email(affiliation: str) -> str:
+    """Extract email from an affiliation string."""
+    email_pattern = re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
+    match = email_pattern.search(affiliation)
+    return match.group(0) if match else ""
